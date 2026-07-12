@@ -172,6 +172,45 @@ export async function adjustBalance(req, res) {
   }
 }
 
+export async function getStats(req, res) {
+  const groupBy = req.query.groupBy === 'month' ? 'month' : 'day';
+  const from = req.query.from || '2000-01-01';
+  const to = req.query.to || '2100-01-01';
+
+  try {
+    const result = await pool.query(
+      `SELECT
+         DATE_TRUNC($3, combined.created_at) AS period,
+         COUNT(DISTINCT combined.user_id) AS players_count,
+         COALESCE(SUM(combined.bet_amount), 0) AS total_bet,
+         COALESCE(SUM(combined.payout_amount), 0) AS total_payout
+       FROM (
+         SELECT user_id, bet_amount, payout_amount, created_at FROM spins
+         UNION ALL
+         SELECT user_id, total_bet AS bet_amount, payout_amount, created_at FROM book_spins
+       ) combined
+       WHERE combined.created_at >= $1 AND combined.created_at <= $2
+       GROUP BY period
+       ORDER BY period DESC
+       LIMIT 90`,
+      [from, to, groupBy]
+    );
+
+    res.json({
+      stats: result.rows.map((r) => ({
+        period: r.period,
+        playersCount: Number(r.players_count),
+        totalBet: Number(r.total_bet),
+        totalPayout: Number(r.total_payout),
+        profit: Number(r.total_bet) - Number(r.total_payout),
+      })),
+    });
+  } catch (err) {
+    console.error('Ошибка загрузки статистики:', err);
+    res.status(500).json({ error: 'Не удалось загрузить статистику' });
+  }
+}
+
 export async function adjustDealerBalance(req, res) {
   const targetId = Number.parseInt(req.params.id, 10);
   const amount = Number.parseInt(req.body.amount, 10);

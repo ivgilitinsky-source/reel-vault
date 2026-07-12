@@ -9,6 +9,7 @@ import {
   deleteDealer,
   toggleBlockDealer,
   adjustDealerBalance,
+  getStats,
 } from '../controllers/adminController.js';
 
 const router = Router();
@@ -22,5 +23,6 @@ router.post('/dealers/:id/toggle-block', toggleBlockDealer);
 router.post('/dealers/:id/adjust-balance', adjustDealerBalance);
 router.get('/players', listAllPlayers);
 router.post('/players/:id/adjust-balance', adjustBalance);
+router.get('/stats', getStats);
 
 export default router;

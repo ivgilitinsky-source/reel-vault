@@ -2,12 +2,44 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { api } from '../api/client.js';
 
+function todayISO() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function daysAgoISO(days) {
+  const d = new Date();
+  d.setDate(d.getDate() - days);
+  return d.toISOString().slice(0, 10);
+}
+
+const periodFormatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' });
+
 export default function AdminDashboard() {
   const { token } = useAuth();
 
   const [dealers, setDealers] = useState(null);
   const [players, setPlayers] = useState(null);
   const [error, setError] = useState('');
+
+  const [statsFrom, setStatsFrom] = useState(daysAgoISO(30));
+  const [statsTo, setStatsTo] = useState(todayISO());
+  const [statsGroupBy, setStatsGroupBy] = useState('day');
+  const [stats, setStats] = useState(null);
+  const [statsError, setStatsError] = useState('');
+  const [statsLoading, setStatsLoading] = useState(false);
+
+  const loadStats = async () => {
+    setStatsError('');
+    setStatsLoading(true);
+    try {
+      const data = await api.getAdminStats({ from: statsFrom, to: statsTo, groupBy: statsGroupBy }, token);
+      setStats(data.stats);
+    } catch (err) {
+      setStatsError(err.message);
+    } finally {
+      setStatsLoading(false);
+    }
+  };
 
   const [dealerForm, setDealerForm] = useState({ username: '', email: '', password: '' });
   const [dealerFormError, setDealerFormError] = useState('');
@@ -29,6 +61,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     loadData();
+    loadStats();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -136,6 +169,73 @@ export default function AdminDashboard() {
         <h1 className="history-card__title">Дилеры и игроки</h1>
 
         {error && <p className="slot-machine__error">{error}</p>}
+
+        <div className="admin-block">
+          <h2 className="admin-block__title">Статистика по всей системе</h2>
+          <div className="admin-inline-form">
+            <label className="field" style={{ minWidth: 140 }}>
+              <span className="field__label">С даты</span>
+              <input
+                className="field__input"
+                type="date"
+                value={statsFrom}
+                onChange={(e) => setStatsFrom(e.target.value)}
+              />
+            </label>
+            <label className="field" style={{ minWidth: 140 }}>
+              <span className="field__label">По дату</span>
+              <input
+                className="field__input"
+                type="date"
+                value={statsTo}
+                onChange={(e) => setStatsTo(e.target.value)}
+              />
+            </label>
+            <label className="field" style={{ minWidth: 120 }}>
+              <span className="field__label">Группировка</span>
+              <select
+                className="field__input"
+                value={statsGroupBy}
+                onChange={(e) => setStatsGroupBy(e.target.value)}
+              >
+                <option value="day">По дням</option>
+                <option value="month">По месяцам</option>
+              </select>
+            </label>
+            <button className="cabinet-btn cabinet-btn--active" onClick={loadStats} disabled={statsLoading}>
+              {statsLoading ? 'Загрузка…' : 'Показать'}
+            </button>
+          </div>
+          {statsError && <p className="slot-machine__error">{statsError}</p>}
+          {stats && stats.length === 0 && <p className="history-card__empty">Нет данных за этот период</p>}
+          {stats && stats.length > 0 && (
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Период</th>
+                  <th>Игроков</th>
+                  <th>Ставок</th>
+                  <th>Выплат</th>
+                  <th>Прибыль</th>
+                </tr>
+              </thead>
+              <tbody>
+                {stats.map((s) => (
+                  <tr key={s.period}>
+                    <td>{periodFormatter.format(new Date(s.period))}</td>
+                    <td>{s.playersCount}</td>
+                    <td>{s.totalBet.toLocaleString('ru-RU')}</td>
+                    <td>{s.totalPayout.toLocaleString('ru-RU')}</td>
+                    <td className={s.profit >= 0 ? 'history-item__net--win' : 'history-item__net--lose'}>
+                      {s.profit >= 0 ? '+' : ''}
+                      {s.profit.toLocaleString('ru-RU')}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
 
         <div className="admin-block">
           <h2 className="admin-block__title">Создать дилера</h2>

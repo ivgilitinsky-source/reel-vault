@@ -8,6 +8,7 @@ import {
   adjustBalance,
   deleteDealer,
   toggleBlockDealer,
+  adjustDealerBalance,
 } from '../controllers/adminController.js';
 
 const router = Router();
@@ -18,6 +19,7 @@ router.post('/dealers', createDealer);
 router.get('/dealers', listDealers);
 router.delete('/dealers/:id', deleteDealer);
 router.post('/dealers/:id/toggle-block', toggleBlockDealer);
+router.post('/dealers/:id/adjust-balance', adjustDealerBalance);
 router.get('/players', listAllPlayers);
 router.post('/players/:id/adjust-balance', adjustBalance);
 

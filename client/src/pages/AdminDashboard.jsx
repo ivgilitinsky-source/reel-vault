@@ -77,6 +77,29 @@ export default function AdminDashboard() {
   const [dealerActionId, setDealerActionId] = useState(null);
   const [dealerActionError, setDealerActionError] = useState('');
 
+  const [dealerBalanceAmounts, setDealerBalanceAmounts] = useState({});
+  const [dealerBalanceId, setDealerBalanceId] = useState(null);
+  const [dealerBalanceError, setDealerBalanceError] = useState('');
+
+  const handleDealerBalanceAdjust = async (id, sign) => {
+    const rawAmount = Number.parseInt(dealerBalanceAmounts[id], 10);
+    if (!Number.isInteger(rawAmount) || rawAmount <= 0) {
+      setDealerBalanceError('Введите положительное число жетонов');
+      return;
+    }
+    setDealerBalanceError('');
+    setDealerBalanceId(id);
+    try {
+      await api.adjustDealerBalance(id, { amount: rawAmount * sign, reason: 'Пополнение админом' }, token);
+      await loadData();
+      setDealerBalanceAmounts((prev) => ({ ...prev, [id]: '' }));
+    } catch (err) {
+      setDealerBalanceError(err.message);
+    } finally {
+      setDealerBalanceId(null);
+    }
+  };
+
   const handleDeleteDealer = async (id, username) => {
     if (!window.confirm(`Удалить дилера "${username}"? Его операторы и игроки вернутся в общий пул.`)) return;
     setDealerActionError('');
@@ -153,6 +176,7 @@ export default function AdminDashboard() {
         <div className="admin-block">
           <h2 className="admin-block__title">Дилеры ({dealers?.length ?? 0})</h2>
           {dealerActionError && <p className="slot-machine__error">{dealerActionError}</p>}
+          {dealerBalanceError && <p className="slot-machine__error">{dealerBalanceError}</p>}
           {dealers && dealers.length === 0 && <p className="history-card__empty">Пока нет дилеров</p>}
           {dealers && dealers.length > 0 && (
             <table className="admin-table">
@@ -162,7 +186,8 @@ export default function AdminDashboard() {
                   <th>Статус</th>
                   <th>Операторов</th>
                   <th>Игроков</th>
-                  <th>Общий баланс</th>
+                  <th>Общий баланс игроков</th>
+                  <th>Пополнить дилеру</th>
                   <th>Реф. ссылка</th>
                   <th>Действия</th>
                 </tr>
@@ -179,27 +204,53 @@ export default function AdminDashboard() {
                     <td>{d.operatorsCount}</td>
                     <td>{d.playersCount}</td>
                     <td>{d.totalBalance.toLocaleString('ru-RU')}</td>
+                    <td>
+                      <div className="admin-adjust">
+                        <input
+                          className="admin-adjust__input"
+                          type="number"
+                          min="1"
+                          placeholder="0"
+                          value={dealerBalanceAmounts[d.id] || ''}
+                          onChange={(e) =>
+                            setDealerBalanceAmounts((prev) => ({ ...prev, [d.id]: e.target.value }))
+                          }
+                        />
+                        <button
+                          className="cabinet-btn"
+                          onClick={() => handleDealerBalanceAdjust(d.id, 1)}
+                          disabled={dealerBalanceId === d.id}
+                        >
+                          +
+                        </button>
+                        <button
+                          className="cabinet-btn"
+                          onClick={() => handleDealerBalanceAdjust(d.id, -1)}
+                          disabled={dealerBalanceId === d.id}
+                        >
+                          −
+                        </button>
+                      </div>
+                    </td>
                     <td className="admin-table__ref">
                       {registerBaseUrl}
                       {d.referralCode}
                     </td>
                     <td>
-                      <div className="admin-adjust">
-                        <button
-                          className="cabinet-btn"
-                          onClick={() => handleToggleBlockDealer(d.id)}
-                          disabled={dealerActionId === d.id}
-                        >
-                          {d.isBlocked ? 'Разблокировать' : 'Заблокировать'}
-                        </button>
-                        <button
-                          className="cabinet-btn cabinet-btn--stop"
-                          onClick={() => handleDeleteDealer(d.id, d.username)}
-                          disabled={dealerActionId === d.id}
-                        >
-                          Удалить
-                        </button>
-                      </div>
+                      <button
+                        className="cabinet-btn"
+                        onClick={() => handleToggleBlockDealer(d.id)}
+                        disabled={dealerActionId === d.id}
+                      >
+                        {d.isBlocked ? 'Разблокировать' : 'Заблокировать'}
+                      </button>
+                      <button
+                        className="cabinet-btn cabinet-btn--stop"
+                        onClick={() => handleDeleteDealer(d.id, d.username)}
+                        disabled={dealerActionId === d.id}
+                      >
+                        Удалить
+                      </button>
                     </td>
                   </tr>
                 ))}

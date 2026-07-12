@@ -56,4 +56,16 @@ export const api = {
   adjustOperatorPlayerBalance: (id, payload, token) =>
     request(`/operator/players/${id}/adjust-balance`, { method: 'POST', body: payload, token }),
   flagPlayerRisk: (id, token) => request(`/operator/players/${id}/flag-risk`, { method: 'POST', token }),
+  adjustDealerBalance: (id, payload, token) =>
+    request(`/admin/dealers/${id}/adjust-balance`, { method: 'POST', body: payload, token }),
+  adjustOperatorBalance: (id, payload, token) =>
+    request(`/dealer/operators/${id}/adjust-balance`, { method: 'POST', body: payload, token }),
+  getDealerStats: (params, token) => {
+    const query = new URLSearchParams(params).toString();
+    return request(`/dealer/stats${query ? `?${query}` : ''}`, { token });
+  },
+  createPromotion: (payload, token) => request('/dealer/promotions', { method: 'POST', body: payload, token }),
+  getPromotions: (token) => request('/dealer/promotions', { token }),
+  deactivatePromotion: (id, token) => request(`/dealer/promotions/${id}/deactivate`, { method: 'POST', token }),
+  redeemPromotion: (code, token) => request('/promotions/redeem', { method: 'POST', body: { code }, token }),
 };

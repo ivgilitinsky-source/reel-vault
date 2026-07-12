@@ -10,6 +10,7 @@ import bookSlotRoutes from './routes/bookSlotRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import dealerRoutes from './routes/dealerRoutes.js';
 import operatorRoutes from './routes/operatorRoutes.js';
+import promotionsRoutes from './routes/promotionsRoutes.js';
 import { notFoundHandler, errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
@@ -32,6 +33,7 @@ app.use('/api/book-slot', bookSlotRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/dealer', dealerRoutes);
 app.use('/api/operator', operatorRoutes);
+app.use('/api/promotions', promotionsRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import pool from '../db.js';
 import { generateReferralCode } from '../utils/referral.js';
+import { performBalanceAdjustment } from '../utils/balanceAdjustment.js';
 
 async function createStaffUser({ username, email, password, role, dealerId }) {
   const passwordHash = await bcrypt.hash(password, 10);
@@ -147,50 +148,54 @@ export async function adjustBalance(req, res) {
     return res.status(400).json({ error: 'Некорректная сумма изменения баланса' });
   }
 
-  const client = await pool.connect();
   try {
-    await client.query('BEGIN');
+    const result = await performBalanceAdjustment({
+      targetId,
+      amount,
+      reason,
+      adjustedByUserId: req.userId,
+      expectedRole: 'player',
+      ownershipCheck: (target) => {
+        if (req.userRole === 'dealer') return target.dealer_id === req.userId;
+        if (req.userRole === 'operator') return target.operator_id === req.userId;
+        return true;
+      },
+    });
 
-    const targetResult = await client.query(
-      'SELECT id, balance, role, dealer_id, operator_id FROM users WHERE id = $1 FOR UPDATE',
-      [targetId]
-    );
-    const target = targetResult.rows[0];
-
-    if (!target || target.role !== 'player') {
-      await client.query('ROLLBACK');
-      return res.status(404).json({ error: 'Игрок не найден' });
+    if (result.error) {
+      return res.status(result.error.status).json({ error: result.error.message });
     }
-
-    if (req.userRole === 'dealer' && target.dealer_id !== req.userId) {
-      await client.query('ROLLBACK');
-      return res.status(403).json({ error: 'Этот игрок не в вашей структуре' });
-    }
-    if (req.userRole === 'operator' && target.operator_id !== req.userId) {
-      await client.query('ROLLBACK');
-      return res.status(403).json({ error: 'Этот игрок не в вашей структуре' });
-    }
-
-    const newBalance = Number(target.balance) + amount;
-    if (newBalance < 0) {
-      await client.query('ROLLBACK');
-      return res.status(400).json({ error: 'Баланс не может стать отрицательным' });
-    }
-
-    await client.query('UPDATE users SET balance = $1 WHERE id = $2', [newBalance, targetId]);
-    await client.query(
-      `INSERT INTO balance_adjustments (target_user_id, adjusted_by_user_id, amount, reason)
-       VALUES ($1, $2, $3, $4)`,
-      [targetId, req.userId, amount, reason]
-    );
-
-    await client.query('COMMIT');
-    res.json({ balance: newBalance });
+    res.json({ balance: result.balance });
   } catch (err) {
-    await client.query('ROLLBACK');
     console.error('Ошибка изменения баланса:', err);
     res.status(500).json({ error: 'Не удалось изменить баланс' });
-  } finally {
-    client.release();
+  }
+}
+
+export async function adjustDealerBalance(req, res) {
+  const targetId = Number.parseInt(req.params.id, 10);
+  const amount = Number.parseInt(req.body.amount, 10);
+  const reason = typeof req.body.reason === 'string' ? req.body.reason.slice(0, 200) : null;
+
+  if (!Number.isInteger(targetId) || !Number.isInteger(amount) || amount === 0) {
+    return res.status(400).json({ error: 'Некорректная сумма изменения баланса' });
+  }
+
+  try {
+    const result = await performBalanceAdjustment({
+      targetId,
+      amount,
+      reason,
+      adjustedByUserId: req.userId,
+      expectedRole: 'dealer',
+    });
+
+    if (result.error) {
+      return res.status(result.error.status).json({ error: result.error.message });
+    }
+    res.json({ balance: result.balance });
+  } catch (err) {
+    console.error('Ошибка изменения баланса дилера:', err);
+    res.status(500).json({ error: 'Не удалось изменить баланс' });
   }
 }

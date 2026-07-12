@@ -63,3 +63,24 @@ CREATE TABLE IF NOT EXISTS notifications (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 CREATE INDEX IF NOT EXISTS idx_notifications_dealer_id ON notifications (dealer_id);
+
+CREATE TABLE IF NOT EXISTS promotions (
+    id SERIAL PRIMARY KEY,
+    dealer_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    code VARCHAR(32) UNIQUE NOT NULL,
+    bonus_amount BIGINT NOT NULL,
+    max_uses INTEGER,
+    uses_count INTEGER NOT NULL DEFAULT 0,
+    expires_at TIMESTAMPTZ,
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_promotions_dealer_id ON promotions (dealer_id);
+
+CREATE TABLE IF NOT EXISTS promotion_redemptions (
+    id SERIAL PRIMARY KEY,
+    promotion_id INTEGER NOT NULL REFERENCES promotions(id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (promotion_id, user_id)
+);

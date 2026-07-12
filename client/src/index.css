@@ -1222,3 +1222,13 @@ button {
   border-color: var(--color-magenta);
   background: rgba(255, 79, 163, 0.06);
 }
+
+.promo-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.promo-form .field__input {
+  flex: 1;
+}

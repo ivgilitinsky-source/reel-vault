@@ -29,6 +29,9 @@ export default function Navbar() {
             {user.role === 'dealer' && (
               <Link to="/dealer" className="navbar__link navbar__link--cta">Дилер</Link>
             )}
+            {user.role === 'operator' && (
+              <Link to="/operator" className="navbar__link navbar__link--cta">Оператор</Link>
+            )}
             <button className="navbar__link navbar__link--button" onClick={handleLogout}>
               Выйти
             </button>

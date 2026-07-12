@@ -24,16 +24,21 @@ export default function DealerDashboard() {
   const [claimingId, setClaimingId] = useState(null);
   const [claimError, setClaimError] = useState('');
 
+  const [notifications, setNotifications] = useState(null);
+  const [notifError, setNotifError] = useState('');
+
   const loadData = async () => {
     try {
-      const [operatorsData, playersData, poolData] = await Promise.all([
+      const [operatorsData, playersData, poolData, notifData] = await Promise.all([
         api.getOperators(token),
         api.getDealerPlayers(token),
         api.getDealerPool(token),
+        api.getDealerNotifications(token),
       ]);
       setOperators(operatorsData.operators);
       setPlayers(playersData.players);
       setPool(poolData.players);
+      setNotifications(notifData.notifications);
     } catch (err) {
       setError(err.message);
     }
@@ -113,6 +118,15 @@ export default function DealerDashboard() {
     }
   };
 
+  const handleMarkRead = async (id) => {
+    try {
+      await api.markNotificationRead(id, token);
+      await loadData();
+    } catch (err) {
+      setNotifError(err.message);
+    }
+  };
+
   const registerBaseUrl = `${window.location.origin}/register?ref=`;
 
   return (
@@ -122,6 +136,42 @@ export default function DealerDashboard() {
         <h1 className="history-card__title">Операторы и игроки</h1>
 
         {error && <p className="slot-machine__error">{error}</p>}
+
+        <div className="admin-block">
+          <h2 className="admin-block__title">
+            Уведомления {notifications && notifications.filter((n) => !n.isRead).length > 0
+              ? `(${notifications.filter((n) => !n.isRead).length} новых)`
+              : ''}
+          </h2>
+          {notifError && <p className="slot-machine__error">{notifError}</p>}
+          {notifications && notifications.length === 0 && (
+            <p className="history-card__empty">Уведомлений пока нет</p>
+          )}
+          {notifications && notifications.length > 0 && (
+            <ul className="history-list">
+              {notifications.map((n) => (
+                <li key={n.id} className={`history-item ${n.isRead ? '' : 'notification-item--unread'}`}>
+                  <span className="history-item__game">{n.message}</span>
+                  <div className="history-item__meta">
+                    <span className="history-item__date">
+                      {new Intl.DateTimeFormat('ru-RU', {
+                        day: 'numeric',
+                        month: 'short',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      }).format(new Date(n.createdAt))}
+                    </span>
+                  </div>
+                  {!n.isRead && (
+                    <button className="cabinet-btn" onClick={() => handleMarkRead(n.id)}>
+                      Прочитано
+                    </button>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
 
         <div className="admin-block">
           <h2 className="admin-block__title">Создать оператора</h2>

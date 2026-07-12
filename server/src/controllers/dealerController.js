@@ -2,6 +2,45 @@ import bcrypt from 'bcryptjs';
 import pool from '../db.js';
 import { generateReferralCode } from '../utils/referral.js';
 
+export async function listNotifications(req, res) {
+  try {
+    const result = await pool.query(
+      `SELECT n.id, n.message, n.is_read, n.created_at, n.player_id, p.username AS player_username
+       FROM notifications n
+       LEFT JOIN users p ON p.id = n.player_id
+       WHERE n.dealer_id = $1
+       ORDER BY n.created_at DESC
+       LIMIT 50`,
+      [req.userId]
+    );
+
+    res.json({
+      notifications: result.rows.map((r) => ({
+        id: r.id,
+        message: r.message,
+        isRead: r.is_read,
+        playerId: r.player_id,
+        playerUsername: r.player_username,
+        createdAt: r.created_at,
+      })),
+    });
+  } catch (err) {
+    console.error('Ошибка загрузки уведомлений:', err);
+    res.status(500).json({ error: 'Не удалось загрузить уведомления' });
+  }
+}
+
+export async function markNotificationRead(req, res) {
+  const id = Number.parseInt(req.params.id, 10);
+  try {
+    await pool.query('UPDATE notifications SET is_read = true WHERE id = $1 AND dealer_id = $2', [id, req.userId]);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Ошибка обновления уведомления:', err);
+    res.status(500).json({ error: 'Не удалось обновить уведомление' });
+  }
+}
+
 export async function createOperator(req, res) {
   const { username, email, password } = req.body;
   if (!username || !email || !password) {

@@ -48,4 +48,12 @@ export const api = {
   claimPlayerAsDealer: (id, token) => request(`/dealer/players/${id}/claim`, { method: 'POST', token }),
   adjustDealerPlayerBalance: (id, payload, token) =>
     request(`/dealer/players/${id}/adjust-balance`, { method: 'POST', body: payload, token }),
+  getDealerNotifications: (token) => request('/dealer/notifications', { token }),
+  markNotificationRead: (id, token) => request(`/dealer/notifications/${id}/read`, { method: 'POST', token }),
+  getOperatorPlayers: (token) => request('/operator/players', { token }),
+  getOperatorPool: (token) => request('/operator/pool', { token }),
+  claimPlayerAsOperator: (id, token) => request(`/operator/players/${id}/claim`, { method: 'POST', token }),
+  adjustOperatorPlayerBalance: (id, payload, token) =>
+    request(`/operator/players/${id}/adjust-balance`, { method: 'POST', body: payload, token }),
+  flagPlayerRisk: (id, token) => request(`/operator/players/${id}/flag-risk`, { method: 'POST', token }),
 };

@@ -10,6 +10,7 @@ import History from './pages/History.jsx';
 import Leaderboard from './pages/Leaderboard.jsx';
 import AdminDashboard from './pages/AdminDashboard.jsx';
 import DealerDashboard from './pages/DealerDashboard.jsx';
+import OperatorDashboard from './pages/OperatorDashboard.jsx';
 import NotFound from './pages/NotFound.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import RequireRole from './components/RequireRole.jsx';
@@ -68,6 +69,14 @@ export default function App() {
           element={
             <RequireRole role="dealer">
               <DealerDashboard />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/operator"
+          element={
+            <RequireRole role="operator">
+              <OperatorDashboard />
             </RequireRole>
           }
         />

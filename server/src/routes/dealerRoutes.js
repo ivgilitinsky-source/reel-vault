@@ -8,6 +8,8 @@ import {
   listPlayers,
   listPool,
   claimPlayer,
+  listNotifications,
+  markNotificationRead,
 } from '../controllers/dealerController.js';
 import { adjustBalance } from '../controllers/adminController.js';
 
@@ -22,5 +24,7 @@ router.get('/players', listPlayers);
 router.get('/pool', listPool);
 router.post('/players/:id/claim', claimPlayer);
 router.post('/players/:id/adjust-balance', adjustBalance);
+router.get('/notifications', listNotifications);
+router.post('/notifications/:id/read', markNotificationRead);
 
 export default router;

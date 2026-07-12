@@ -9,7 +9,6 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE INDEX IF NOT EXISTS idx_users_username_lower ON users (LOWER(username));
 
--- Роли и иерархия: admin -> dealer -> operator -> player
 ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(16) NOT NULL DEFAULT 'player';
 ALTER TABLE users ADD COLUMN IF NOT EXISTS dealer_id INTEGER REFERENCES users(id) ON DELETE SET NULL;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS operator_id INTEGER REFERENCES users(id) ON DELETE SET NULL;
@@ -53,3 +52,14 @@ CREATE TABLE IF NOT EXISTS book_spins (
 );
 
 CREATE INDEX IF NOT EXISTS idx_book_spins_user_id ON book_spins (user_id);
+
+CREATE TABLE IF NOT EXISTS notifications (
+    id SERIAL PRIMARY KEY,
+    dealer_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    operator_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    player_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    message TEXT NOT NULL,
+    is_read BOOLEAN NOT NULL DEFAULT false,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_notifications_dealer_id ON notifications (dealer_id);

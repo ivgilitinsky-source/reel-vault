@@ -20,8 +20,12 @@ export default function Navbar() {
         {user ? (
           <>
             <Link to="/play" className="navbar__link">Автомат</Link>
+            <Link to="/book-slot" className="navbar__link">Книга сокровищ</Link>
             <Link to="/history" className="navbar__link">История</Link>
             <Link to="/profile" className="navbar__link">Профиль</Link>
+            {user.role === 'admin' && (
+              <Link to="/admin" className="navbar__link navbar__link--cta">Админ</Link>
+            )}
             <button className="navbar__link navbar__link--button" onClick={handleLogout}>
               Выйти
             </button>

@@ -29,5 +29,15 @@ export const api = {
   getPaytable: () => request('/slot/paytable'),
   spin: (betAmount, token) => request('/slot/spin', { method: 'POST', body: { betAmount }, token }),
   getHistory: (token) => request('/history', { token }),
+  getHistoryStats: (token) => request('/history/stats', { token }),
   getLeaderboard: () => request('/leaderboard'),
+  getBookPaytable: () => request('/book-slot/paytable'),
+  bookSpin: (payload, token) => request('/book-slot/spin', { method: 'POST', body: payload, token }),
+  createDealer: (payload, token) => request('/admin/dealers', { method: 'POST', body: payload, token }),
+  getDealers: (token) => request('/admin/dealers', { token }),
+  deleteDealer: (id, token) => request(`/admin/dealers/${id}`, { method: 'DELETE', token }),
+  toggleBlockDealer: (id, token) => request(`/admin/dealers/${id}/toggle-block`, { method: 'POST', token }),
+  getAllPlayers: (token) => request('/admin/players', { token }),
+  adjustPlayerBalance: (id, payload, token) =>
+    request(`/admin/players/${id}/adjust-balance`, { method: 'POST', body: payload, token }),
 };

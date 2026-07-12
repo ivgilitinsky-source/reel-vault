@@ -5,10 +5,13 @@ import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Profile from './pages/Profile.jsx';
 import Slot from './pages/Slot.jsx';
+import BookSlot from './pages/BookSlot.jsx';
 import History from './pages/History.jsx';
 import Leaderboard from './pages/Leaderboard.jsx';
+import AdminDashboard from './pages/AdminDashboard.jsx';
 import NotFound from './pages/NotFound.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
+import RequireRole from './components/RequireRole.jsx';
 
 export default function App() {
   return (
@@ -35,6 +38,14 @@ export default function App() {
           }
         />
         <Route
+          path="/book-slot"
+          element={
+            <ProtectedRoute>
+              <BookSlot />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/history"
           element={
             <ProtectedRoute>
@@ -43,6 +54,14 @@ export default function App() {
           }
         />
         <Route path="/leaderboard" element={<Leaderboard />} />
+        <Route
+          path="/admin"
+          element={
+            <RequireRole role="admin">
+              <AdminDashboard />
+            </RequireRole>
+          }
+        />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>

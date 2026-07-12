@@ -53,7 +53,6 @@ button {
   flex-direction: column;
 }
 
-/* Navbar */
 .navbar {
   display: flex;
   align-items: center;
@@ -99,7 +98,6 @@ button {
   font-weight: 600;
 }
 
-/* Hero */
 .hero {
   flex: 1;
   display: flex;
@@ -173,7 +171,6 @@ button {
   color: rgba(156, 143, 176, 0.7);
 }
 
-/* Signature marquee button: рамка из бегущих огней, как на старых вывесках казино */
 .marquee-btn {
   position: relative;
   display: inline-flex;
@@ -251,7 +248,6 @@ button {
   }
 }
 
-/* Auth pages */
 .auth-page {
   flex: 1;
   display: flex;
@@ -343,7 +339,6 @@ button {
   text-decoration: none;
 }
 
-/* Profile page */
 .profile-page {
   flex: 1;
   display: flex;
@@ -419,7 +414,6 @@ button {
   margin-top: 20px;
 }
 
-/* History page */
 .history-page,
 .leaderboard-page {
   flex: 1;
@@ -513,7 +507,6 @@ button {
   color: var(--color-text-muted);
 }
 
-/* Leaderboard page */
 .leaderboard-list {
   list-style: none;
   margin: 0 0 24px;
@@ -564,7 +557,6 @@ button {
   color: rgba(156, 143, 176, 0.7);
 }
 
-/* Slot machine page */
 .slot-page {
   flex: 1;
   display: flex;
@@ -733,7 +725,118 @@ button {
   color: var(--color-text);
 }
 
-/* Not found & loading */
+.book-page {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.book-machine {
+  width: 100%;
+  max-width: 640px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-surface-border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35);
+}
+
+.book-machine__bonus-banner {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-magenta);
+  background: rgba(255, 79, 163, 0.1);
+  border: 1px solid rgba(255, 79, 163, 0.3);
+  padding: 8px 14px;
+  border-radius: 999px;
+  text-align: center;
+}
+
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  padding: 16px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.15));
+  border: 1px solid var(--color-surface-border);
+  border-radius: var(--radius-md);
+  width: 100%;
+}
+
+.book-grid__reel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.book-cell {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: var(--color-bg-alt);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--color-text);
+  text-align: center;
+  padding: 4px;
+}
+
+.book-cell--ANKH,
+.book-cell--EYE {
+  background: rgba(232, 184, 75, 0.1);
+  color: var(--color-gold-soft);
+  font-size: 12px;
+}
+
+.book-cell--SCARAB,
+.book-cell--PYRAMID {
+  background: rgba(232, 184, 75, 0.2);
+  border-color: rgba(232, 184, 75, 0.4);
+  color: var(--color-gold);
+  font-size: 12px;
+}
+
+.book-cell--BOOK {
+  background: rgba(255, 79, 163, 0.15);
+  border-color: rgba(255, 79, 163, 0.5);
+  color: var(--color-magenta);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.book-grid--spinning .book-cell {
+  animation: reel-blur 0.07s linear infinite;
+}
+
+.book-wins {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.book-wins li {
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+
 .not-found,
 .page-loading {
   flex: 1;
@@ -760,4 +863,357 @@ button {
   .auth-card {
     padding: 24px;
   }
+}
+
+/* Панель управления в стиле кабинета игрового автомата */
+.cabinet-panel {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px;
+  background: linear-gradient(180deg, #2a2a32, #16161c);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+}
+
+.cabinet-panel__group {
+  display: flex;
+  gap: 6px;
+}
+
+.cabinet-panel__group--main {
+  margin-left: auto;
+}
+
+.cabinet-btn {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #e8e6ef;
+  background: linear-gradient(180deg, #4a4a56, #2c2c34);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 10px 12px;
+  cursor: pointer;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.cabinet-btn:hover:not(:disabled) {
+  background: linear-gradient(180deg, #56566a, #34343e);
+}
+
+.cabinet-btn:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+}
+
+.cabinet-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.cabinet-btn--active {
+  background: linear-gradient(180deg, var(--color-gold-soft), var(--color-gold));
+  color: #2a1c00;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.cabinet-btn--spin {
+  background: linear-gradient(180deg, #ff6fb8, var(--color-magenta));
+  color: #2a0016;
+  padding: 10px 22px;
+  font-size: 13px;
+}
+
+.cabinet-btn--spin:hover:not(:disabled) {
+  background: linear-gradient(180deg, #ff8ac5, #ff5fa0);
+}
+
+.cabinet-btn--stop {
+  background: linear-gradient(180deg, #ff8a6b, #d9482a);
+  color: #2a0d00;
+  padding: 10px 22px;
+  font-size: 13px;
+}
+
+@media (max-width: 560px) {
+  .cabinet-panel {
+    justify-content: center;
+  }
+  .cabinet-panel__group--main {
+    margin-left: 0;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.book-grid {
+  position: relative;
+}
+
+.book-lines-overlay {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.book-grid {
+  position: relative;
+}
+
+.book-lines-overlay {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Admin dashboard */
+.admin-page {
+  flex: 1;
+  padding: 40px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.admin-card {
+  width: 100%;
+  max-width: 900px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-surface-border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  text-align: center;
+}
+
+.admin-block {
+  margin-top: 28px;
+  text-align: left;
+}
+
+.admin-block__title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  letter-spacing: 0.02em;
+  margin: 0 0 12px;
+  color: var(--color-gold-soft);
+}
+
+.admin-inline-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-inline-form .field__input {
+  flex: 1;
+  min-width: 140px;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--color-text-muted);
+}
+
+.admin-table th {
+  color: var(--color-text);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+}
+
+.admin-table__ref {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-gold-soft);
+  word-break: break-all;
+}
+
+.admin-adjust {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.admin-adjust__input {
+  width: 70px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 4px 6px;
+  color: var(--color-text);
+  font-size: 12px;
+}
+
+/* Admin dashboard */
+.admin-page {
+  flex: 1;
+  padding: 40px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.admin-card {
+  width: 100%;
+  max-width: 900px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-surface-border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  text-align: center;
+}
+
+.admin-block {
+  margin-top: 28px;
+  text-align: left;
+}
+
+.admin-block__title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  letter-spacing: 0.02em;
+  margin: 0 0 12px;
+  color: var(--color-gold-soft);
+}
+
+.admin-inline-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-inline-form .field__input {
+  flex: 1;
+  min-width: 140px;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--color-text-muted);
+}
+
+.admin-table th {
+  color: var(--color-text);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+}
+
+.admin-table__ref {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-gold-soft);
+  word-break: break-all;
+}
+
+.admin-adjust {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.admin-adjust__input {
+  width: 70px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 4px 6px;
+  color: var(--color-text);
+  font-size: 12px;
+}
+
+.admin-status {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.admin-status--active {
+  color: #34d399;
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.admin-status--blocked {
+  color: var(--color-danger);
+  background: rgba(255, 107, 107, 0.12);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
+.history-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.history-stats__card {
+  flex: 1;
+  min-width: 160px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 12px 14px;
+  text-align: left;
+}
+
+.history-stats__game {
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: var(--color-gold-soft);
+  letter-spacing: 0.02em;
+}
+
+.history-stats__row {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.history-stats__net {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.history-item__game {
+  font-family: var(--font-display);
+  font-size: 13px;
+  color: var(--color-gold-soft);
+  letter-spacing: 0.02em;
 }

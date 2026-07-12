@@ -18,6 +18,7 @@ export default function Navbar() {
       <nav className="navbar__links">
         {user ? (
           <>
+            <Link to="/play" className="navbar__link">Автомат</Link>
             <Link to="/profile" className="navbar__link">Профиль</Link>
             <button className="navbar__link navbar__link--button" onClick={handleLogout}>
               Выйти

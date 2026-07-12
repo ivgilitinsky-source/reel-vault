@@ -56,8 +56,14 @@ export function AuthProvider({ children }) {
 
   const refreshProfile = () => loadProfile(token);
 
+  const updateBalance = (balance) => {
+    setUser((prev) => (prev ? { ...prev, balance } : prev));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout, refreshProfile }}>
+    <AuthContext.Provider
+      value={{ user, token, loading, login, register, logout, refreshProfile, updateBalance }}
+    >
       {children}
     </AuthContext.Provider>
   );

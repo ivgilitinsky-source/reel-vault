@@ -1,4 +1,6 @@
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import MarqueeButton from '../components/MarqueeButton.jsx';
 
 const dateFormatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
 
@@ -21,7 +23,13 @@ export default function Profile() {
           <span className="balance-display__value">{user.balance.toLocaleString('ru-RU')}</span>
         </div>
 
-        <p className="profile-card__hint">Игровой автомат и история игр скоро появятся здесь.</p>
+        <div className="profile-card__cta">
+          <MarqueeButton as={Link} to="/play">
+            Играть в автомат
+          </MarqueeButton>
+        </div>
+
+        <p className="profile-card__hint">История игр и таблица лидеров скоро появятся здесь.</p>
       </section>
     </main>
   );

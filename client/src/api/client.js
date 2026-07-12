@@ -26,4 +26,6 @@ export const api = {
   register: (payload) => request('/auth/register', { method: 'POST', body: payload }),
   login: (payload) => request('/auth/login', { method: 'POST', body: payload }),
   getProfile: (token) => request('/profile', { token }),
+  getPaytable: () => request('/slot/paytable'),
+  spin: (betAmount, token) => request('/slot/spin', { method: 'POST', body: { betAmount }, token }),
 };

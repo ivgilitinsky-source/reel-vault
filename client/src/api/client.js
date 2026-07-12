@@ -40,4 +40,12 @@ export const api = {
   getAllPlayers: (token) => request('/admin/players', { token }),
   adjustPlayerBalance: (id, payload, token) =>
     request(`/admin/players/${id}/adjust-balance`, { method: 'POST', body: payload, token }),
+  createOperator: (payload, token) => request('/dealer/operators', { method: 'POST', body: payload, token }),
+  getOperators: (token) => request('/dealer/operators', { token }),
+  deleteOperator: (id, token) => request(`/dealer/operators/${id}`, { method: 'DELETE', token }),
+  getDealerPlayers: (token) => request('/dealer/players', { token }),
+  getDealerPool: (token) => request('/dealer/pool', { token }),
+  claimPlayerAsDealer: (id, token) => request(`/dealer/players/${id}/claim`, { method: 'POST', token }),
+  adjustDealerPlayerBalance: (id, payload, token) =>
+    request(`/dealer/players/${id}/adjust-balance`, { method: 'POST', body: payload, token }),
 };

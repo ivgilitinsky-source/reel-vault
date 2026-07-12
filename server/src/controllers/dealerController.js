@@ -65,6 +65,23 @@ export async function listOperators(req, res) {
   }
 }
 
+export async function deleteOperator(req, res) {
+  const operatorId = Number.parseInt(req.params.id, 10);
+  try {
+    const result = await pool.query(
+      `DELETE FROM users WHERE id = $1 AND role = 'operator' AND dealer_id = $2 RETURNING id`,
+      [operatorId, req.userId]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Оператор не найден' });
+    }
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Ошибка удаления оператора:', err);
+    res.status(500).json({ error: 'Не удалось удалить оператора' });
+  }
+}
+
 export async function listPlayers(req, res) {
   try {
     const result = await pool.query(

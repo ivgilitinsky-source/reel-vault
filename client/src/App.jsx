@@ -9,6 +9,7 @@ import BookSlot from './pages/BookSlot.jsx';
 import History from './pages/History.jsx';
 import Leaderboard from './pages/Leaderboard.jsx';
 import AdminDashboard from './pages/AdminDashboard.jsx';
+import DealerDashboard from './pages/DealerDashboard.jsx';
 import NotFound from './pages/NotFound.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import RequireRole from './components/RequireRole.jsx';
@@ -59,6 +60,14 @@ export default function App() {
           element={
             <RequireRole role="admin">
               <AdminDashboard />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/dealer"
+          element={
+            <RequireRole role="dealer">
+              <DealerDashboard />
             </RequireRole>
           }
         />

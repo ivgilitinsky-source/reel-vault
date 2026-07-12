@@ -1,5 +1,41 @@
 import pool from '../db.js';
 
+export async function listAvailablePromotions(req, res) {
+  try {
+    const userResult = await pool.query('SELECT dealer_id, role FROM users WHERE id = $1', [req.userId]);
+    const user = userResult.rows[0];
+
+    if (!user || user.role !== 'player' || !user.dealer_id) {
+      return res.json({ promotions: [] });
+    }
+
+    const result = await pool.query(
+      `SELECT p.id, p.code, p.bonus_amount, p.max_uses, p.uses_count, p.expires_at
+       FROM promotions p
+       WHERE p.dealer_id = $1
+         AND p.is_active = true
+         AND (p.expires_at IS NULL OR p.expires_at > NOW())
+         AND (p.max_uses IS NULL OR p.uses_count < p.max_uses)
+         AND NOT EXISTS (
+           SELECT 1 FROM promotion_redemptions r WHERE r.promotion_id = p.id AND r.user_id = $2
+         )
+       ORDER BY p.created_at DESC`,
+      [user.dealer_id, req.userId]
+    );
+
+    res.json({
+      promotions: result.rows.map((r) => ({
+        id: r.id,
+        code: r.code,
+        bonusAmount: Number(r.bonus_amount),
+      })),
+    });
+  } catch (err) {
+    console.error('Ошибка загрузки доступных акций:', err);
+    res.status(500).json({ error: 'Не удалось загрузить акции' });
+  }
+}
+
 export async function redeemPromotion(req, res) {
   const code = typeof req.body.code === 'string' ? req.body.code.trim().toUpperCase() : '';
   if (!code) {

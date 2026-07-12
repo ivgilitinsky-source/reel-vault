@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { api } from '../api/client.js';
@@ -12,23 +12,51 @@ export default function Profile() {
   const [promoMessage, setPromoMessage] = useState('');
   const [promoError, setPromoError] = useState('');
   const [redeeming, setRedeeming] = useState(false);
+  const [availablePromos, setAvailablePromos] = useState(null);
+  const [claimingPromoId, setClaimingPromoId] = useState(null);
+
+  const loadAvailablePromos = async () => {
+    try {
+      const data = await api.getAvailablePromotions(token);
+      setAvailablePromos(data.promotions);
+    } catch (err) {
+      // тихо игнорируем — это не критично для отображения профиля
+    }
+  };
+
+  useEffect(() => {
+    loadAvailablePromos();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const redeemCode = async (code) => {
+    setPromoError('');
+    setPromoMessage('');
+    try {
+      const result = await api.redeemPromotion(code, token);
+      updateBalance(result.balance);
+      setPromoMessage(`Начислено +${result.bonusAmount.toLocaleString('ru-RU')} жетонов!`);
+      await loadAvailablePromos();
+      return true;
+    } catch (err) {
+      setPromoError(err.message);
+      return false;
+    }
+  };
+
+  const handleClaimPromo = async (promo) => {
+    setClaimingPromoId(promo.id);
+    await redeemCode(promo.code);
+    setClaimingPromoId(null);
+  };
 
   const handleRedeemPromo = async (e) => {
     e.preventDefault();
     if (!promoCode.trim()) return;
-    setPromoError('');
-    setPromoMessage('');
     setRedeeming(true);
-    try {
-      const result = await api.redeemPromotion(promoCode.trim(), token);
-      updateBalance(result.balance);
-      setPromoMessage(`Начислено +${result.bonusAmount.toLocaleString('ru-RU')} жетонов!`);
-      setPromoCode('');
-    } catch (err) {
-      setPromoError(err.message);
-    } finally {
-      setRedeeming(false);
-    }
+    const ok = await redeemCode(promoCode.trim());
+    if (ok) setPromoCode('');
+    setRedeeming(false);
   };
 
   if (!user) return null;
@@ -52,6 +80,26 @@ export default function Profile() {
             Играть в автомат
           </MarqueeButton>
         </div>
+
+        {availablePromos && availablePromos.length > 0 && (
+          <div className="available-promos">
+            <p className="field__label" style={{ textAlign: 'center', margin: '0 0 8px' }}>
+              🎁 Доступные бонусы
+            </p>
+            {availablePromos.map((promo) => (
+              <button
+                key={promo.id}
+                className="cabinet-btn cabinet-btn--active available-promos__btn"
+                onClick={() => handleClaimPromo(promo)}
+                disabled={claimingPromoId === promo.id}
+              >
+                {claimingPromoId === promo.id
+                  ? 'Забираем…'
+                  : `Новый бонус: +${promo.bonusAmount.toLocaleString('ru-RU')} жетонов`}
+              </button>
+            ))}
+          </div>
+        )}
 
         <form className="promo-form" onSubmit={handleRedeemPromo}>
           <input

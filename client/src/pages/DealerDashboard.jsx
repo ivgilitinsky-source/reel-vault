@@ -231,6 +231,47 @@ export default function DealerDashboard() {
     }
   };
 
+  const [giftAmounts, setGiftAmounts] = useState({});
+  const [giftingId, setGiftingId] = useState(null);
+  const [giftError, setGiftError] = useState('');
+
+  const handleGiftFromNotification = async (notification) => {
+    const rawAmount = Number.parseInt(giftAmounts[notification.id], 10);
+    if (!Number.isInteger(rawAmount) || rawAmount <= 0) {
+      setGiftError('Введите положительное число жетонов');
+      return;
+    }
+    if (!notification.playerId) {
+      setGiftError('У этого уведомления нет привязанного игрока');
+      return;
+    }
+    setGiftError('');
+    setGiftingId(notification.id);
+    try {
+      await api.adjustDealerPlayerBalance(
+        notification.playerId,
+        { amount: rawAmount, reason: 'Подарок от дилера (из уведомления)' },
+        token
+      );
+      await api.markNotificationRead(notification.id, token);
+      await loadData();
+      setGiftAmounts((prev) => ({ ...prev, [notification.id]: '' }));
+    } catch (err) {
+      setGiftError(err.message);
+    } finally {
+      setGiftingId(null);
+    }
+  };
+
+  const promoStats = promotions
+    ? {
+        total: promotions.length,
+        active: promotions.filter((p) => p.isActive).length,
+        redemptions: promotions.reduce((sum, p) => sum + p.usesCount, 0),
+        tokensGiven: promotions.reduce((sum, p) => sum + p.usesCount * p.bonusAmount, 0),
+      }
+    : null;
+
   const registerBaseUrl = `${window.location.origin}/register?ref=`;
 
   return (
@@ -249,13 +290,14 @@ export default function DealerDashboard() {
               : ''}
           </h2>
           {notifError && <p className="slot-machine__error">{notifError}</p>}
+          {giftError && <p className="slot-machine__error">{giftError}</p>}
           {notifications && notifications.length === 0 && (
             <p className="history-card__empty">Уведомлений пока нет</p>
           )}
           {notifications && notifications.length > 0 && (
             <ul className="history-list">
               {notifications.map((n) => (
-                <li key={n.id} className={`history-item ${n.isRead ? '' : 'notification-item--unread'}`}>
+                <li key={n.id} className={`history-item notification-item ${n.isRead ? '' : 'notification-item--unread'}`}>
                   <span className="history-item__game">{n.message}</span>
                   <div className="history-item__meta">
                     <span className="history-item__date">
@@ -267,11 +309,32 @@ export default function DealerDashboard() {
                       }).format(new Date(n.createdAt))}
                     </span>
                   </div>
-                  {!n.isRead && (
-                    <button className="cabinet-btn" onClick={() => handleMarkRead(n.id)}>
-                      Прочитано
-                    </button>
-                  )}
+                  <div className="notification-item__actions">
+                    {n.playerId && (
+                      <div className="admin-adjust">
+                        <input
+                          className="admin-adjust__input"
+                          type="number"
+                          min="1"
+                          placeholder="Жетонов"
+                          value={giftAmounts[n.id] || ''}
+                          onChange={(e) => setGiftAmounts((prev) => ({ ...prev, [n.id]: e.target.value }))}
+                        />
+                        <button
+                          className="cabinet-btn cabinet-btn--active"
+                          onClick={() => handleGiftFromNotification(n)}
+                          disabled={giftingId === n.id}
+                        >
+                          {giftingId === n.id ? 'Дарим…' : 'Подарить'}
+                        </button>
+                      </div>
+                    )}
+                    {!n.isRead && (
+                      <button className="cabinet-btn" onClick={() => handleMarkRead(n.id)}>
+                        Прочитано
+                      </button>
+                    )}
+                  </div>
                 </li>
               ))}
             </ul>
@@ -391,6 +454,24 @@ export default function DealerDashboard() {
 
         <div className="admin-block">
           <h2 className="admin-block__title">Акции ({promotions?.length ?? 0})</h2>
+          {promoStats && (
+            <div className="history-stats">
+              <div className="history-stats__card">
+                <span className="history-stats__game">Всего акций</span>
+                <span className="history-stats__row">{promoStats.total} (активно: {promoStats.active})</span>
+              </div>
+              <div className="history-stats__card">
+                <span className="history-stats__game">Активаций</span>
+                <span className="history-stats__row">{promoStats.redemptions}</span>
+              </div>
+              <div className="history-stats__card">
+                <span className="history-stats__game">Роздано жетонов</span>
+                <span className="history-stats__net history-item__net--lose">
+                  −{promoStats.tokensGiven.toLocaleString('ru-RU')}
+                </span>
+              </div>
+            </div>
+          )}
           {promoActionError && <p className="slot-machine__error">{promoActionError}</p>}
           {promotions && promotions.length === 0 && <p className="history-card__empty">Пока нет акций</p>}
           {promotions && promotions.length > 0 && (

@@ -68,6 +68,7 @@ export const api = {
   getPromotions: (token) => request('/dealer/promotions', { token }),
   deactivatePromotion: (id, token) => request(`/dealer/promotions/${id}/deactivate`, { method: 'POST', token }),
   redeemPromotion: (code, token) => request('/promotions/redeem', { method: 'POST', body: { code }, token }),
+  getAvailablePromotions: (token) => request('/promotions/available', { token }),
   getAdminStats: (params, token) => {
     const query = new URLSearchParams(params).toString();
     return request(`/admin/stats${query ? `?${query}` : ''}`, { token });

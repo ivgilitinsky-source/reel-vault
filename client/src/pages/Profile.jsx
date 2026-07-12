@@ -29,7 +29,14 @@ export default function Profile() {
           </MarqueeButton>
         </div>
 
-        <p className="profile-card__hint">История игр и таблица лидеров скоро появятся здесь.</p>
+        <div className="profile-card__links">
+          <Link to="/history" className="slot-machine__back">
+            История игр
+          </Link>
+          <Link to="/leaderboard" className="slot-machine__back">
+            Лидерборд
+          </Link>
+        </div>
       </section>
     </main>
   );

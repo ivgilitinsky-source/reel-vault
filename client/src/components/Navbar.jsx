@@ -16,9 +16,11 @@ export default function Navbar() {
         REEL <span>VAULT</span>
       </Link>
       <nav className="navbar__links">
+        <Link to="/leaderboard" className="navbar__link">Лидерборд</Link>
         {user ? (
           <>
             <Link to="/play" className="navbar__link">Автомат</Link>
+            <Link to="/history" className="navbar__link">История</Link>
             <Link to="/profile" className="navbar__link">Профиль</Link>
             <button className="navbar__link navbar__link--button" onClick={handleLogout}>
               Выйти

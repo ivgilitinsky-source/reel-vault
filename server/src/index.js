@@ -4,6 +4,8 @@ import cors from 'cors';
 import authRoutes from './routes/authRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
 import slotRoutes from './routes/slotRoutes.js';
+import historyRoutes from './routes/historyRoutes.js';
+import leaderboardRoutes from './routes/leaderboardRoutes.js';
 import { notFoundHandler, errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
@@ -20,6 +22,8 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/slot', slotRoutes);
+app.use('/api/history', historyRoutes);
+app.use('/api/leaderboard', leaderboardRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

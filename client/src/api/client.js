@@ -28,4 +28,6 @@ export const api = {
   getProfile: (token) => request('/profile', { token }),
   getPaytable: () => request('/slot/paytable'),
   spin: (betAmount, token) => request('/slot/spin', { method: 'POST', body: { betAmount }, token }),
+  getHistory: (token) => request('/history', { token }),
+  getLeaderboard: () => request('/leaderboard'),
 };
